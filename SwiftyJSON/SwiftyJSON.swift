@@ -32,7 +32,7 @@ public enum JSON {
     case Mapping(Dictionary<String, JSON>)
     case Null(NSError?)
     
-    init(data:NSData, options opt: NSJSONReadingOptions = nil, error: NSErrorPointer = nil) {
+    public init(data:NSData, options opt: NSJSONReadingOptions = nil, error: NSErrorPointer = nil) {
         if let object: AnyObject = NSJSONSerialization.JSONObjectWithData(data, options: opt, error: error){
             self = JSON(object: object)
         } else {
@@ -40,7 +40,7 @@ public enum JSON {
         }
     }
     
-    init(object: AnyObject) {
+    public init(object: AnyObject) {
         switch object {
         case let number as NSNumber:
             self = .ScalarNumber(number)
@@ -69,7 +69,7 @@ public enum JSON {
 }
 
 // MARK: - Subscript
-extension JSON {
+public extension JSON {
     
     subscript(index: Int) -> JSON {
         get {
@@ -131,7 +131,7 @@ extension JSON: Printable, DebugPrintable {
 }
 
 // MARK: - Sequence: Array<JSON>
-extension JSON {
+public extension JSON {
     
     var arrayValue: Array<JSON>? {
         get {
@@ -146,7 +146,7 @@ extension JSON {
 }
 
 // MARK: - Mapping: Dictionary<String, JSON>
-extension JSON {
+public extension JSON {
     
     var dictionaryValue: Dictionary<String, JSON>? {
         get {
@@ -182,7 +182,7 @@ extension JSON: BooleanType {
 }
 
 //MARK: - Scalar: String, NSNumber, NSURL, Int, ...
-extension JSON {
+public extension JSON {
 
     var stringValue: String? {
         get {
@@ -349,9 +349,32 @@ extension JSON {
     }
 }
 
+//MARK: - Any value
+public extension JSON {
+
+  var anyValue: Any? {
+    switch self {
+      case .ScalarNumber(let number): return number
+      case .ScalarString(let string): return string
+      case .Sequence(let array): return array
+      case .Mapping(let dictionary): return dictionary
+      default: return nil
+    }
+  }
+
+  var anyObject: AnyObject? {
+    switch self {
+    case .ScalarNumber(let number): return number
+    case .ScalarString(let string): return string
+    default: return nil
+    }
+  }
+
+}
+
 //MARK: - Comparable
 extension JSON: Comparable {
-    
+
    private var type: Int {
         get {
             switch self {
