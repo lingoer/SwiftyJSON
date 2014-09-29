@@ -32,8 +32,8 @@ public enum JSON {
     case Mapping(Dictionary<String, JSON>)
     case Null(NSError?)
     
-    public init(data:NSData, options opt: NSJSONReadingOptions = nil, error: NSErrorPointer = nil) {
-        if let object: AnyObject = NSJSONSerialization.JSONObjectWithData(data, options: opt, error: error){
+    public init(data:NSData, error: NSErrorPointer = nil) {
+        if let object: AnyObject = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: error){
             self = JSON(object: object)
         } else {
             self = .Null(nil)
@@ -65,6 +65,14 @@ public enum JSON {
         default:
             self = .Null(nil)
         }
+    }
+
+    public init(_ dictionary: [String: AnyObject?]) {
+        var aJSONDictionary = [String: JSON]()
+        for (key: String, value: AnyObject?) in dictionary {
+          aJSONDictionary[key] = value != nil ? JSON(object: value!) : JSON.Null(nil)
+        }
+        self = .Mapping(aJSONDictionary)
     }
 }
 
